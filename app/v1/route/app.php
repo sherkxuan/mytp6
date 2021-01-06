@@ -10,11 +10,6 @@
 // +----------------------------------------------------------------------
 use think\facade\Route;
 
-Route::get('think', function () {
-    return 'hello,ThinkPHP6!';
-});
 
-Route::get('hello/:name', 'index/hello');
-Route::get('/uploads/:name', function (){
-    return 'hello,ThinkPHP6!';
-});
+//上传文件路由
+Route::rule('upload', 'Upload/upload01','post|get');

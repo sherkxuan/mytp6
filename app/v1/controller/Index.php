@@ -2,18 +2,18 @@
 declare (strict_types = 1);
 
 namespace app\v1\controller;
-
-/**
+use think\facade\Request;
+/**`
  * Class Index
  * @package app\v1\controller
  */
-class Index
+class Index extends Restful
 {
     /**
-     * @return string
+     * @return \think\response\Json
      */
     public function index()
     {
-        return '您好！这是一个[v1]示例应用';
+        return $this->resCode(200,Request::domain());
     }
 }
