@@ -12,4 +12,9 @@ use think\facade\Route;
 
 
 //上传文件路由
-Route::rule('upload', 'Upload/upload01','post|get');
+Route::rule('upload', 'Upload/upload02','post|get')
+    ->middleware(\app\middleware\ApiCount::class,'upload');
+
+Route::miss(function() {
+    return '404 Not Found!';
+});
