@@ -18,7 +18,7 @@ class ApiCount
      * @param \think\Request $request
      * @param \Closure $next
      * @param string $api_route
-     * @return Response
+     * @return Response|\think\response\Redirect
      */
     public function handle(\think\Request $request, \Closure $next,$api_route='')
     {
@@ -28,26 +28,25 @@ class ApiCount
                 //查询当前接口信息
                 $res = Db::name('api_info')->where('api_route', $api_route)->find();
             } catch (DbException $e) {
-                $request->Apistatus = ['code'=>'500','data'=>'当前接口异常，请稍后再试'];
-                return $next($request);
+                return redirect('returnCode/code/500/data/API exception!');
             }
             //判断接口是否存在
             if(isset($res)){
-                //判断接口是否已调用完
+                //判断接口是否已调用完/若为负数表示无限调用
                 if($res['call_num']==0) {
-                    $request->Apistatus = ['code' => '500', 'data' => '当前接口次数已用完'];
-                    return $next($request);
+                    return redirect('returnCode/code/500/data/API calls are zero!');
                 }
                 //判断接口是否开启
                 if($res['status']!=1){
-                    $request->Apistatus = ['code'=>'500','data'=>'当前接口已停用'];
-                    return $next($request);
+                    return redirect('returnCode/code/500/data/API closed!');
                 }
                 //判断请求者ip是否已被禁用
-                if(in_array($request->ip(),explode(',', $res['forbid_ip']))){
-                    $request->Apistatus = ['code'=>'205','data'=>'当前ip已被禁用'];
-                    return $next($request);
+                if(isset($res['forbid_ip'])){
+                    if(in_array($request->ip(),explode(',', $res['forbid_ip']))){
+                        return redirect('returnCode/code/500/data/The current IP is blocked!');
+                    }
                 }
+
                 //成功调用,api剩余次数减一
                 try {
                     Db::name('api_info')
@@ -55,8 +54,7 @@ class ApiCount
                         ->dec('call_num')
                         ->update(['update_time' => time()]);
                 } catch (DbException $e) {
-                    $request->Apistatus = ['code'=>'500','data'=>'当前接口异常，请稍后再试'];
-                    return $next($request);
+                    return redirect('returnCode/code/500/data/API exception!');
                 }
 
                 //判断是否滥用接口
@@ -66,8 +64,7 @@ class ApiCount
                     ->where('create_time','between',[time()-3,time()])
                     ->count('id');
                 if($num>10){
-                    $request->Apistatus = ['code'=>'500','data'=>'API调用次数过多，请稍后再试'];
-                    return $next($request);
+                    return redirect('returnCode/code/500/data/API calls frequently, please try again later!');
                 }
                 //组装数据
                 $data = [
@@ -77,9 +74,8 @@ class ApiCount
                 ];
                 //接口请求成功插入到日志表
                 Db::name('api_log')->insert($data);
-                $request->Apistatus = ['code'=>'200'];
             }else{
-                $request->Apistatus = ['code'=>'500','data'=>'当前接口不存在'];
+                return redirect('returnCode/code/500/data/The API does not exist!');
             }
         }
         //返回

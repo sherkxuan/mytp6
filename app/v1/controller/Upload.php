@@ -7,6 +7,7 @@ use think\facade\Request;
 use think\facade\Db;
 
 /**
+ * 上传文件类
  * Class Upload
  * @package app\v1\controller
  */
@@ -48,9 +49,6 @@ class Upload extends Restful
      * @return \think\response\Json
      */
     public function upload02(){
-        //加载中间件传过来的参数
-        $code = request()->Apistatus;
-        if($code['code']!=200)return $this->resCode($code['code'],$code['data']);
         //获取文件类别
         $type = request()->param('file_type');
         if(!isset($type))return $this->resCode(202);

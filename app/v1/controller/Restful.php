@@ -12,6 +12,7 @@ use app\BaseController;
 class Restful extends BaseController
 {
     /**
+     * 返回状态码
      * @param $code
      * @param string $data
      * @return \think\response\Json
@@ -37,5 +38,30 @@ class Restful extends BaseController
             default:
                 return json(['code'=>500,'data'=>$data ?? '系统错误，稍后再试']);
         }
+    }
+
+    /**
+     * @return string[]|\think\response\Json
+     */
+    public function isToken(){
+        $token = request()->header('token');
+        if(!$token)return ['code' => '201', 'data' => 'Token不存在'];
+        $res = checkToken($token);
+        if($res){
+            return ['code'=>200,'data'=>$res['uid']];
+        }else{
+            return ['code'=>201,'data'=>'token已过期'];
+        }
+
+        /*
+         * //token验证器
+         *
+        $res = $this->isToken();
+        //判断token是否过期
+        if($res['code']!=200)return $this->resCode($res['code'],$res['data']);
+        //获取token里面的值
+        $uid = $res['data'];
+        *
+        */
     }
 }

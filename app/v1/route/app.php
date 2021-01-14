@@ -10,21 +10,19 @@
 // +----------------------------------------------------------------------
 use think\facade\Route;
 use think\facade\Db;
-
 try {
     $res = Db::name('api_info')->select();
 } catch (\think\db\exception\DbException $e) {
     return '404 Not Found!';
 }
 //halt($res);
-//上传文件路由
+//调用接口路由，执行中间件路由
 foreach ($res as $v){
-    Route::rule($v['api_route'], $v['api_map'],'post|get')
+    Route::rule($v['api_route'], $v['api_map'],$v['method'])
         ->middleware(\app\middleware\ApiCount::class,$v['api_route']);
 }
-/*Route::rule('upload', 'Upload/upload02','post|get')
-    ->middleware(\app\middleware\ApiCount::class,'upload');*/
-
+//错误专用回调路由
+Route::rule('returnCode', 'Redirect/returnCode','get');
 Route::miss(function() {
-    return '404 Not Found!';
+    return json(['code'=>500,'msg'=>'非法请求']);
 });

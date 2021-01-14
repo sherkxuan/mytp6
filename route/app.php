@@ -18,3 +18,6 @@ Route::get('hello/:name', 'index/hello');
 Route::get('/uploads/:name', function (){
     return 'hello,ThinkPHP6!';
 });
+Route::miss(function() {
+    return json(['code'=>500,'msg'=>'非法请求']);
+});
