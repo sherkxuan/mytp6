@@ -21,8 +21,10 @@ foreach ($res as $v){
     Route::rule($v['api_route'], $v['api_map'],$v['method'])
         ->middleware(\app\middleware\ApiCount::class,$v['api_route']);
 }
+
 //错误专用回调路由
 Route::rule('returnCode', 'Redirect/returnCode','get');
+
 Route::miss(function() {
-    return json(['code'=>500,'msg'=>'非法请求']);
+    return json(['code'=>500,'data'=>'非法请求']);
 });

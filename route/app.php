@@ -19,5 +19,5 @@ Route::get('/uploads/:name', function (){
     return 'hello,ThinkPHP6!';
 });
 Route::miss(function() {
-    return json(['code'=>500,'msg'=>'非法请求']);
+    return json(['code'=>500,'data'=>'非法请求']);
 });

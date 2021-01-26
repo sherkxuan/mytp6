@@ -13,7 +13,7 @@ use think\facade\Request;
 class IsAdminLogin
 {
     /**
-     * 处理请求
+     * 判断是否登录
      *
      * @param \think\Request $request
      * @param \Closure       $next

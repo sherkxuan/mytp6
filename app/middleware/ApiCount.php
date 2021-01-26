@@ -38,7 +38,8 @@ class ApiCount
                 }
                 //判断接口是否开启
                 if($res['status']!=1){
-                    return redirect('returnCode/code/500/data/API closed!');
+                    //halt($request->domain().'/v1/returnCode/code/500/data/API closed!');
+                    return redirect('http://zx.cn/v1/returnCode/code/500/data/API closed!');
                 }
                 //判断请求者ip是否已被禁用
                 if(isset($res['forbid_ip'])){
