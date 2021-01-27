@@ -6,6 +6,7 @@ namespace app\v1\controller;
 
 use app\middleware\IsAdminLogin;
 use app\v1\model\ApiInfo;
+use think\facade\Db;
 use think\db\exception\DbException;
 use think\facade\Request;
 
@@ -155,5 +156,57 @@ class Api extends Restful
             ApiInfo::destroy($v);
         }
         return $this->resCode(200);
+    }
+
+    /**
+     * 查询最新的前50条记录
+     * @return \think\response\Json
+     * @throws DbException
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     */
+    public function getApiLog(){
+        $res = Db::name('api_log')
+                ->alias('a')
+                ->join('zy_api_info b','a.aid = b.id')
+                ->limit(50)
+                ->field('b.name,a.access_ip,b.method,a.create_time')
+                ->order('a.create_time','desc')
+                ->select();
+        return $this->resCode(200,$res);
+    }
+
+    /**
+     * API调用排行
+     * @return \think\response\Json
+     * @throws DbException
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     */
+    public function getCountApi(){
+        $res = Db::name('api_log')
+                ->alias('a')
+                ->field('b.name,count(a.aid) as num')
+                ->join('zy_api_info b','a.aid = b.id')
+                ->limit(20)
+                ->group('a.aid')
+                ->order('num','desc')
+                ->select();
+        return $this->resCode(200,$res);
+    }
+
+    /**
+     * 查询接口调用次数小于1000的api
+     * @return \think\response\Json
+     * @throws DbException
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     */
+    public function getApiWarning(){
+        $res = ApiInfo::where('call_num','<=',1000)
+                ->where('call_num','>=',0)
+                ->field('name,call_num')
+                ->select();
+        return $this->resCode(200,$res);
     }
 }
