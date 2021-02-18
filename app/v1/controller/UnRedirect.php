@@ -7,10 +7,20 @@ use think\facade\Request;
 
 /**
  * 重定向专用控制器
- * Class Redirect
+ *
+ *
+ * 已
+ * 废
+ * 弃
+ *
+ *
+ *
+ *
+ *
+ * Class UnRedirect
  * @package app\v1\controller
  */
-class Redirect extends Restful
+class UnRedirect extends Restful
 {
     /**
      * @return \think\response\Json

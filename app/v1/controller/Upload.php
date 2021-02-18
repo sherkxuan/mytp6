@@ -50,10 +50,11 @@ class Upload extends Restful
      */
     public function upload02(){
         //获取文件类别
-        $type = request()->param('file_type');
-        if(!isset($type))return $this->resCode(202);
+        //$type = request()->param('file_type');
+        $type = $this->getData('file_type');
+        //if(!isset($type))return $this->resCode(202);
 
-        $type_array = ['image','video','file','audio'];
+        $type_array = ['image','video','file','audio'];//后期判断文件后缀是否是上传的类型
         if(!in_array($type,$type_array))return $this->resCode(203,'file_type参数错误');
         // 获取表单上传文件
         try {

@@ -29,7 +29,6 @@
 namespace app\v1\controller;
 
 use think\db\exception\DbException;
-use think\facade\Request;
 use think\facade\Db;
 
 /**
@@ -44,24 +43,25 @@ class Login extends Restful
      */
     public function adminLogin(){
         //获取请求参数
-        $username = Request::param('username');
+        /*$username = Request::param('username');
         if(!$username)return  $this->resCode(202,'Username parameter error');
         $password = Request::param('password');
-        if(!$password)return $this->resCode(202,'Password parameter error');
-
+        if(!$password)return $this->resCode(202,'Password parameter error');*/
+        $username = $this->getData('username');
+        $password = $this->getData('password');
         try {
             $admin = Db::name('system_admin')->where('account', $username)->find();
         } catch (DbException $e) {
             return $this->resCode(500,'系统错误，稍后再试');
         }
-        if(!isset($admin))return $this->resCode(202,'用户不存在');
+        if(!isset($admin))return $this->resCode(200,['msg'=>'用户不存在','token'=>'','status'=>0]);
         //设置密码
         //echo password_hash("123456", PASSWORD_DEFAULT);
         if (!password_verify($password, $admin['pwd'])) {
-            return $this->resCode(205,'密码错误');
+            return $this->resCode(200,['msg'=>'密码错误','token'=>'','status'=>0]);
         }else{
             $token = createToken($admin['id']);
-            return $this->resCode(200,['msg'=>'登录成功','token'=>$token]);
+            return $this->resCode(200,['msg'=>'登录成功','token'=>$token,'status'=>1]);
         }
 
     }
@@ -71,7 +71,8 @@ class Login extends Restful
      * @return \think\response\Json
      */
     public function isLogin(){
-        $token = Request::param('token');
+        //$token = Request::param('token');
+        $token = $this->getData('token');
         $res = checkToken($token);
         if(isset($res['code'])){
             return $this->resCode(201,$res['data']);

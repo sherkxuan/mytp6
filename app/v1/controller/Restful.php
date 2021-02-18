@@ -1,10 +1,11 @@
 <?php
+/** @noinspection PhpSeparateElseIfInspection */
 declare (strict_types = 1);
 
 namespace app\v1\controller;
 
 use app\BaseController;
-
+use think\facade\Request;
 /**
  * Class Restful
  * @package app\v1\controller
@@ -63,5 +64,61 @@ class Restful extends BaseController
         $uid = $res['data'];
         *
         */
+    }
+
+    /**
+     * 获取数据验证器
+     * 参数一:string|array
+     * 说明:可以传入一个字符串或者一个数组,用来获取前端的值,默认为空，表示获取全部的值
+     *
+     * 参数二:boolen
+     * 说明:是否开启强制校验，默认为true开启状态,表示传进来的值不能为空,否则允许为空
+     * @param string $data
+     * @param false $is_null
+     * @return array|mixed
+     */
+    public function getData($data='', $is_null=true){
+        if(is_array($data)){
+            $res = [];
+            foreach ($data as $v){
+                $res[$v] = Request::param($v);
+            }
+        }else{
+            $res = Request::param($data);
+        }
+        if(empty($res)){
+            echo json_encode(['code'=>202,'data'=>'请求参数不存在']);
+            exit;
+        }
+        if(is_array($res)){
+            $this->arrCheck($res,$is_null);
+        }else{
+            if(empty($res)){
+                echo json_encode(['code'=>202,'data'=>'请求参数不存在']);
+                exit;
+            }
+        }
+        return $res;
+    }
+
+    /**
+     * 供上一个方法调用，用来判断是否开启强制校验
+     * @param $res
+     * @param $is_null
+     */
+    public function arrCheck($res, $is_null){
+        if($is_null){
+            foreach ($res as $i){
+                if(empty($i)){
+                    echo json_encode(['code'=>202,'data'=>'请求参数不存在']);
+                    exit;
+                }
+            }
+        }else{
+            if(empty($res)){
+                echo json_encode(['code'=>202,'data'=>'请求参数不存在']);
+                exit;
+            }
+        }
     }
 }

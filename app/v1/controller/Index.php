@@ -10,10 +10,10 @@ use think\facade\Request;
 class Index extends Restful
 {
     /**
-     * @return \think\response\Json
+     * @return string
      */
     public function index()
     {
-        return $this->resCode(200,Request::domain());
+        dd($this->getData('',true));
     }
 }

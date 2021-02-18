@@ -23,7 +23,7 @@ foreach ($res as $v){
 }
 
 //错误专用回调路由
-Route::rule('returnCode', 'Redirect/returnCode','get');
+Route::rule('returnCode', 'UnRedirect/returnCode','get');
 
 Route::miss(function() {
     return json(['code'=>500,'data'=>'非法请求']);

@@ -25,7 +25,8 @@
         "topthink/think-orm": "^2.0",
         "topthink/think-multi-app": "^1.0",
         "firebase/php-jwt": "^5.2",
-        "ext-json": "*"
+        "ext-json": "*",
+        "overtrue/wechat": "~5.0"
     },
     "require-dev": {
         "symfony/var-dumper": "^4.2",

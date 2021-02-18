@@ -3,6 +3,7 @@ declare (strict_types = 1);
 
 namespace app\v1\controller;
 
+use app\v1\model\SystemAdmin;
 use think\db\exception\DbException;
 use think\facade\Db;
 use app\middleware\IsAdminLogin;
@@ -15,7 +16,9 @@ use app\middleware\IsAdminLogin;
 class Admin extends Restful
 {
     protected $middleware = [IsAdminLogin::class];
+
     /**
+     * 查询管理员详细信息
      * @return \think\response\Json
      */
     public function getMyInfo(){
@@ -33,6 +36,18 @@ class Admin extends Restful
         } catch (DbException $e) {
             return $this->resCode(500);
         }
+        return $this->resCode(200,$res);
+    }
+
+    /**
+     * 查询管理员列表
+     * @return \think\response\Json
+     * @throws DbException
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     */
+    public function getAdminList(){
+        $res = SystemAdmin::select();
         return $this->resCode(200,$res);
     }
 }

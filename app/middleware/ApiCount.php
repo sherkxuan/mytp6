@@ -1,5 +1,5 @@
 <?php
-/** @noinspection PhpSeparateElseIfInspection */
+/** @noinspection PhpUnreachableStatementInspection */
 declare (strict_types = 1);
 
 namespace app\middleware;
@@ -18,7 +18,7 @@ class ApiCount
      * @param \think\Request $request
      * @param \Closure $next
      * @param string $api_route
-     * @return Response|\think\response\Redirect
+     * @return \think\response\Json|\think\response\Redirect
      */
     public function handle(\think\Request $request, \Closure $next,$api_route='')
     {
@@ -28,23 +28,27 @@ class ApiCount
                 //查询当前接口信息
                 $res = Db::name('api_info')->where('api_route', $api_route)->find();
             } catch (DbException $e) {
-                return redirect('returnCode/code/500/data/API exception!');
+                return json(['code'=>500,'data'=>'API出现异常!']);exit;
+                //return redirect('returnCode/code/500/data/API exception!');
             }
             //判断接口是否存在
             if(isset($res)){
                 //判断接口是否已调用完/若为负数表示无限调用
                 if($res['call_num']==0) {
-                    return redirect('returnCode/code/500/data/API calls are zero!');
+                    return json(['code'=>500,'data'=>'API调用次数已用完']);exit;
+                    // return redirect('http://api.sherkxuan.ren/v1/returnCode/code/500/data/API calls are zero!');
                 }
                 //判断接口是否开启
                 if($res['status']!=1){
+                    return json(['code'=>500,'data'=>'当前API已关闭!']);exit;
                     //halt($request->domain().'/v1/returnCode/code/500/data/API closed!');
-                    return redirect('http://zx.cn/v1/returnCode/code/500/data/API closed!');
+                    //return redirect('http://api.sherkxuan.ren/v1/returnCode/code/500/data/API closed!');
                 }
                 //判断请求者ip是否已被禁用
                 if(isset($res['forbid_ip'])){
                     if(in_array($request->ip(),explode(',', $res['forbid_ip']))){
-                        return redirect('returnCode/code/500/data/The current IP is blocked!');
+                        return json(['code'=>500,'data'=>'禁止当前IP访问此API']);exit;
+                        //return redirect('http://api.sherkxuan.ren/v1/returnCode/code/500/data/The current IP is blocked!');
                     }
                 }
 
@@ -55,7 +59,8 @@ class ApiCount
                         ->dec('call_num')
                         ->update(['update_time' => time()]);
                 } catch (DbException $e) {
-                    return redirect('returnCode/code/500/data/API exception!');
+                    return json(['code'=>500,'data'=>'API出现异常!']);exit;
+                    //return redirect('http://api.sherkxuan.ren/v1/returnCode/code/500/data/API exception!');
                 }
 
                 //判断是否滥用接口
@@ -65,7 +70,8 @@ class ApiCount
                     ->where('create_time','between',[time()-3,time()])
                     ->count('id');
                 if($num>10){
-                    return redirect('returnCode/code/500/data/API calls frequently, please try again later!');
+                    return json(['code'=>500,'data'=>'频繁调用此API,给予警告!']);exit;
+                    //return redirect('http://api.sherkxuan.ren/v1/returnCode/code/500/data/API calls frequently, please try again later!');
                 }
                 //组装数据
                 $data = [
@@ -76,7 +82,8 @@ class ApiCount
                 //接口请求成功插入到日志表
                 Db::name('api_log')->insert($data);
             }else{
-                return redirect('returnCode/code/500/data/The API does not exist!');
+                return json(['code'=>500,'data'=>'API不存在!']);exit;
+                //return redirect('http://api.sherkxuan.ren/v1/returnCode/code/500/data/The API does not exist!');
             }
         }
         //返回

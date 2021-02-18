@@ -17,17 +17,21 @@ class IsAdminLogin
      *
      * @param \think\Request $request
      * @param \Closure       $next
-     * @return Response|\think\response\Redirect
+     * @return \think\response\Json
      * @noinspection PhpMissingParamTypeInspection
+     * @noinspection PhpUnreachableStatementInspection
      */
     public function handle($request, \Closure $next)
     {
         //
         $token = Request::header('token');
+        if(!$token){
+            return json(['code'=>201,'data'=>'Token不存在!']);exit;
+        }
         $tokenData = checkToken($token);
 
         if(isset($tokenData['code'])){
-            return redirect('returnCode/code/'.$tokenData['code'].'/data/'.$tokenData['data']);
+            return json(['code'=>$tokenData['code'],'data'=>$tokenData['data']]);exit;
         }
         $request->aid = $tokenData['uid'];
         return $next($request);

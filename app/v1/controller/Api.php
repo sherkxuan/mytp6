@@ -38,7 +38,8 @@ class Api extends Restful
      * @return \think\response\Json
      */
     public function addApi(){
-        $data=Request::param();
+        //$data=Request::param();
+        $data = $this->getData('',false);
         $model = new ApiInfo();
         $res = $model->save($data);
         if($res == 1){
@@ -51,11 +52,16 @@ class Api extends Restful
 
     /**
      * 根据ID删除API
+     *
+     * 后期有时间优化:
+     * 根据传进来的值判断是否是数组
+     * 数组?循环删除:单独删除
      * @return \think\response\Json
      */
     public function delApi(){
-        $id = Request::param('id');
-        if(!$id)return  $this->resCode(202);
+        //$id = Request::param('id');
+        $id = $this->getData('id');
+        //if(!$id)return  $this->resCode(202);
         $res = ApiInfo::destroy($id);
         if($res){
             return $this->resCode(200);
@@ -72,8 +78,9 @@ class Api extends Restful
      * @throws \think\db\exception\ModelNotFoundException
      */
     public function isRouteMap(){
-        $name = Request::param('name');
-        if(!$name)return  $this->resCode(202);
+        //$name = Request::param('name');
+        $name = $this->getData('name');
+        //if(!$name)return  $this->resCode(202);
         $res = ApiInfo::where('api_route',$name)->whereOr('api_map',$name)->find();
         if($res){
             return $this->resCode(200,true);
@@ -90,8 +97,9 @@ class Api extends Restful
      * @throws \think\db\exception\ModelNotFoundException
      */
     public function setApiStatus(){
-        $id = Request::param('id');
-        if(!$id)return  $this->resCode(202);
+        //$id = Request::param('id');
+        //if(!$id)return  $this->resCode(202);
+        $id = $this->getData('id');
         $data = ApiInfo::find($id);
         if($data['status']){
             $data->status = 0;
@@ -114,8 +122,9 @@ class Api extends Restful
      * @throws \think\db\exception\ModelNotFoundException
      */
     public function getApiById(){
-        $id = Request::param('id');
-        if(!$id)return  $this->resCode(202);
+       // $id = Request::param('id');
+        //if(!$id)return  $this->resCode(202);
+        $id = $this->getData('id');
         $data = ApiInfo::field('api_route,api_map,name,exp,forbid_ip,method,call_num,status')->find($id);
         if($data){
             return $this->resCode(200,$data);
@@ -132,8 +141,9 @@ class Api extends Restful
      * @throws \think\db\exception\ModelNotFoundException
      */
     public function editApi(){
-        $id = Request::param('id');
-        if(!$id)return  $this->resCode(202);
+        //$id = Request::param('id');
+        //if(!$id)return  $this->resCode(202);
+        $id = $this->getData('id');
         $data = Request::except(['id'], 'post');
         $edit = ApiInfo::find($id);
         $res = $edit->save($data);
@@ -150,8 +160,9 @@ class Api extends Restful
      * @return \think\response\Json
      */
     public function delAll(){
-        $ids = Request::param();
-        if(!$ids)return  $this->resCode(202);
+        //$ids = Request::param();
+        //if(!$ids)return  $this->resCode(202);
+        $ids = $this->getData();
         foreach ($ids as $v){
             ApiInfo::destroy($v);
         }

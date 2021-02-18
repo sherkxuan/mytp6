@@ -34,7 +34,7 @@ function checkToken($token)
 {
     $res = Cache::get('token');
     if($res!=$token.Request::ip()){
-        return ['code'=>201,'data'=>'Token has expired!'];
+        return ['code'=>201,'data'=>'Token已过期!'];
     }
     try{
         $Result = JWT::decode($token,'sherk668',['HS256']);
@@ -44,6 +44,6 @@ function checkToken($token)
     }
     catch (Exception $e)
     {
-        return ['code'=>201,'data'=>'Token has expired!'];
+        return ['code'=>201,'data'=>'Token已过期!'];
     }
 }
