@@ -60,9 +60,14 @@ class Api extends Restful
      */
     public function delApi(){
         //$id = Request::param('id');
-        $id = $this->getData('id');
+        $ids = $this->getData('id');
+        $type = $this->getData('type');
         //if(!$id)return  $this->resCode(202);
-        $res = ApiInfo::destroy($id);
+        if($type==1){
+            $res = ApiInfo::destroy($ids,true);
+        }else{
+            $res = ApiInfo::destroy($ids);
+        }
         if($res){
             return $this->resCode(200);
         }else{
@@ -156,16 +161,14 @@ class Api extends Restful
     }
 
     /**
-     * 删除选中的id集合
+     * 删除选中的id集合(已废弃)
      * @return \think\response\Json
      */
     public function delAll(){
-        //$ids = Request::param();
-        //if(!$ids)return  $this->resCode(202);
-        $ids = $this->getData();
+        /*$ids = $this->getData();
         foreach ($ids as $v){
             ApiInfo::destroy($v);
-        }
+        }*/
         return $this->resCode(200);
     }
 

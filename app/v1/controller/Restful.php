@@ -86,16 +86,18 @@ class Restful extends BaseController
         }else{
             $res = Request::param($data);
         }
-        if(empty($res)){
+        /*if($res==null && $res!==0){
             echo json_encode(['code'=>202,'data'=>'请求参数不存在']);
             exit;
-        }
+        }*/
         if(is_array($res)){
             $this->arrCheck($res,$is_null);
         }else{
-            if(empty($res)){
-                echo json_encode(['code'=>202,'data'=>'请求参数不存在']);
-                exit;
+            if($is_null){
+                if(empty($res) && $res!==0){
+                    echo json_encode(['code'=>202,'data'=>'请求参数不存在']);
+                    exit;
+                }
             }
         }
         return $res;
@@ -109,16 +111,27 @@ class Restful extends BaseController
     public function arrCheck($res, $is_null){
         if($is_null){
             foreach ($res as $i){
-                if(empty($i)){
+                if((empty($i) && $i!==0)){
                     echo json_encode(['code'=>202,'data'=>'请求参数不存在']);
                     exit;
                 }
             }
         }else{
-            if(empty($res)){
+            if(empty($res) && $res!==0){
                 echo json_encode(['code'=>202,'data'=>'请求参数不存在']);
                 exit;
             }
         }
+    }
+
+    /**
+     * 处理空的方法
+     * @param $method
+     * @param $args
+     * @return \think\response\Json
+     */
+    public function __call($method, $args)
+    {
+        return json(['code'=>500,'data'=>'系统错误']);
     }
 }

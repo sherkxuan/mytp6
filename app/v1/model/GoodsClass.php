@@ -9,7 +9,7 @@ use think\model\concern\SoftDelete;
 /**
  * @mixin \think\Model
  */
-class ApiInfo extends Model
+class GoodsClass extends Model
 {
     //
     use SoftDelete;

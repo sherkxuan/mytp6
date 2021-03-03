@@ -5,6 +5,7 @@ declare (strict_types = 1);
 namespace app\middleware;
 
 use think\db\exception\DbException;
+use think\facade\Cache;
 use think\facade\Db;
 /**
  * Class ApiCount
@@ -46,9 +47,9 @@ class ApiCount
                 }
                 //判断请求者ip是否已被禁用
                 if(isset($res['forbid_ip'])){
-                    if(in_array($request->ip(),explode(',', $res['forbid_ip']))){
+                    if(in_array($request->ip(),explode('|', $res['forbid_ip']))){
+                        Cache::clear();
                         return json(['code'=>500,'data'=>'禁止当前IP访问此API']);exit;
-                        //return redirect('http://api.sherkxuan.ren/v1/returnCode/code/500/data/The current IP is blocked!');
                     }
                 }
 
@@ -70,7 +71,25 @@ class ApiCount
                     ->where('create_time','between',[time()-3,time()])
                     ->count('id');
                 if($num>10){
-                    return json(['code'=>500,'data'=>'频繁调用此API,给予警告!']);exit;
+                    if(Cache::get($request->ip())){
+                        Cache::inc($request->ip());
+                    }else{
+                        Cache::set($request->ip(),1,3600);
+                    }
+                    if(Cache::get($request->ip())==5){
+                        try {
+                            Db::name('api_info')
+                                ->where('id', $res['id'])
+                                ->update(['forbid_ip'=>empty($res['forbid_ip'])?$request->ip():$res['forbid_ip'].'|'.$request->ip()]);
+                        } catch (DbException $e) {
+                            return json(['code'=>500,'data'=>'API出现异常!']);exit;
+                        }
+                        Cache::delete($request->ip());
+                        return json(['code'=>500,'data'=>'你已被禁止访问该API!']);exit;
+                    }else{
+                        return json(['code'=>500,'data'=>'频繁调用此API,给予警告!']);exit;
+                    }
+
                     //return redirect('http://api.sherkxuan.ren/v1/returnCode/code/500/data/API calls frequently, please try again later!');
                 }
                 //组装数据

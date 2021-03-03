@@ -15,7 +15,7 @@ Route::get('think', function () {
 });
 Route::get('hello/:name', 'index/hello');
 Route::get('/uploads/:name', function (){
-    return 'hello,ThinkPHP6!';
+    return json(['code'=>500,'data'=>'资源已删除']);
 });
 Route::miss(function() {
     return json(['code'=>500,'data'=>'非法请求']);
